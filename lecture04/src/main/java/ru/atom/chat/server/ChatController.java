@@ -56,6 +56,27 @@ public class ChatController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @RequestMapping(
+            path = "chat",
+            method = RequestMethod.GET,
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity chat() {
+        String responseBody = String.join("\n", messages.stream().sorted().collect(Collectors.toList()));
+        return ResponseEntity.ok(responseBody);
+    }
+
+    @RequestMapping(
+            path = "say",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> say(@RequestParam("name") String name, @RequestParam("msg") String msg) {
+        if (!usersOnline.containsKey(name)) {
+            return ResponseEntity.badRequest().body("This user isn't online");
+        }
+        messages.add("[" + name + "]: " + msg);
+        return ResponseEntity.ok().build();
+    }
     /**
      * curl -X POST -i localhost:8080/chat/logout -d "name=I_AM_STUPID"
      */
